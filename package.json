@@ -1,17 +1,17 @@
 {
   "name": "resumeefy-jobs-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Resumeefy Backend API",
+  "main": "src/server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "dependencies": {
-    "@prisma/client": "^7.3.0",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.67.0",
     "cors": "^2.8.6",
@@ -20,10 +20,10 @@
     "ioredis": "^5.9.2",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.1.5"
+    "mongoose": "^9.1.5",
+    "nodemailer": "^7.0.12"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11",
-    "prisma": "^7.3.0"
+    "nodemon": "^3.1.11"
   }
 }

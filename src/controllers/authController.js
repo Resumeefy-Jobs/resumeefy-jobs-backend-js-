@@ -1,11 +1,22 @@
 import bcrypt from 'bcryptjs';
 import Joi from 'joi';
+import crypto from 'crypto';
 import User from '../models/User.js';
 import JobSeekerProfile from '../models/JobSeekerProfile.js';
 import CompanyProfile from '../models/CompanyProfile.js';
+import { generateAccessToken, generateRefreshToken } from '../utils/TokenService.js';
+import { emailQueue } from '../jobs/emailQueue.js';
 
 export const register = async (req, res) => {
   try {
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ 
+        succeeded: false, 
+        message: 'Request body is empty. Please send JSON data with Content-Type: application/json header.',
+        errors: ['Request body is required']
+      });
+    }
+
     const schema = Joi.object({
       email: Joi.string().email().required().messages({
         'string.email': 'Please provide a valid email address.',
@@ -48,12 +59,14 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
     const newUser = new User({
       email,
       passwordHash,
       role,
-      isActive: true,
-      isEmailVerified: false 
+      verificationToken, 
+      isEmailVerified: false
     });
 
     const savedUser = await newUser.save();
@@ -71,6 +84,21 @@ export const register = async (req, res) => {
         companyName: 'New Company' 
       });
     }
+
+    const combinedString = `${savedUser._id}:${verificationToken}`;
+    const code = Buffer.from(combinedString).toString('base64url');
+
+    const port  = process.env.PORT || 5000;
+    const verificationLink = `http://localhost:${port}/api/auth/verify-email?code=${code}`;
+    var emailHtml = `<h2>Welcome to Resumeefy!</p>
+                     <ph3>Please verify your email by clicking the link below:</p>
+                     <a href="${verificationLink}">Verify Email</a>`;
+
+    await emailQueue.add('sendVerificationEmail', {
+      to: savedUser.email,
+      subject: 'Verify your Resumeefy account',
+      body: emailHtml
+    });
 
     res.status(201).json({
       succeeded: true,
@@ -91,3 +119,51 @@ export const register = async (req, res) => {
     });
   }
 };
+
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const findUser = await User.findOne({ email });
+    if (!findUser) {
+      return res.status(401).json({
+        succeeded: false,
+        message: 'Invalid email or password.'
+        
+      });
+    }
+    const isMatch = await bcrypt.compare(password, findUser.passwordHash);
+    if (!isMatch) {
+      return res.status(401).json({
+        succeeded: false,
+        message: 'Invalid email or password.'
+      });
+    }
+    const accessToken = generateAccessToken(findUser);
+    const refreshToken = await generateRefreshToken(findUser, req.ip);
+    
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      expires: new Date(Date.now() + 7*24*60*60*1000)
+    });
+
+    res.json({
+      successed: true,
+      message: 'Login successful',
+      data: {
+        id: findUser._id,
+        email: findUser.email,
+        role: findUser.role,
+        token: accessToken
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      succeeded: false,
+      message: 'Server Error',
+      errors: [error.message]
+    });
+  }
+}
