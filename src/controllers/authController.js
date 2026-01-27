@@ -132,7 +132,15 @@ export const login = async (req, res) => {
         
       });
     }
+
+    if(!findUser.passwordHash){
+      return res.status(400).json({
+        succeeded: false,
+        message: 'Pls Login with Google or provide your password.'
+      });
+    }
     const isMatch = await bcrypt.compare(password, findUser.passwordHash);
+
     if (!isMatch) {
       return res.status(401).json({
         succeeded: false,
@@ -166,4 +174,67 @@ export const login = async (req, res) => {
       errors: [error.message]
     });
   }
+}
+
+export const verifyEmail = async (req, res ) => {
+  try{
+    const { code } = req.query;
+
+    if(!code){
+      return res.status(400).json({
+        succeeded: false,
+        message: 'Verification code is required.'
+      });
+    }
+
+    const decodedString = Buffer.from(code, 'base64url').toString('utf-8');
+
+    const [userId, token] = decodedString.split(':');
+
+    if(!userId || !token){
+      return res.status(400).json({
+        succeeded: false,
+        message: 'Invalid verification code.'
+      });
+    } 
+
+    const user = await User.findById(userId);
+
+    if(!user){
+      return res.status(404).json({
+        succeeded: false,
+        message: 'User not found.'
+      });
+    }
+
+    if(user.isEmailVerified){
+      return res.status(200).json({
+        succeeded: true,
+        message: 'Email is already verified.'
+      });
+    }
+
+    if(user.verificationToken !== token){
+      return res.status(400).json({
+        succeeded: false,
+        message: 'Invalid or expired verification token.'
+      });
+    }
+
+    user.isEmailVerified = true;
+    user.verificationToken = undefined;
+    await user.save();
+
+    res.status(200).json({
+      succeeded: true,
+      message: 'Email verified successfully./nYou can now log in to your account.'
+    });
+  }catch(error){
+    console.error(error);
+    res.status(500).json({
+      succeeded: false,
+      message: 'Server Error',
+      errors: [error.message]
+    });
+  } 
 }
