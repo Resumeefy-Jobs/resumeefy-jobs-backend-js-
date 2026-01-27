@@ -6,6 +6,7 @@ import JobSeekerProfile from '../models/JobSeekerProfile.js';
 import CompanyProfile from '../models/CompanyProfile.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/TokenService.js';
 import { emailQueue } from '../jobs/emailQueue.js';
+import { verifyGoogleToken } from '../utils/googleAuthService.js';
 
 export const register = async (req, res) => {
   try {
@@ -238,3 +239,84 @@ export const verifyEmail = async (req, res ) => {
     });
   } 
 }
+
+export const googleAuth = async (req, res) =>{
+  try{
+    const{idToken, role} = req.body;
+
+    if(!idToken)
+    {
+      return res.status(400).json({
+        succeeded: false,
+        message: 'Google ID Token is required'
+      });
+    }
+
+    const googleUser  = await verifyGoogleToken(idToken);
+    let user = await User.findOne({email: googleUser.email});
+
+    if(!user){
+      if(!role){
+        return res.status(400).json({
+          succeeded: false,
+          message: 'Role is required for new users.'
+        });
+      }
+    }
+
+    user = new User({
+      email: googleUser.email,
+      passwordHash: 'GOOGLE_AUTH' + Math.random().toString(36),
+      role : role,
+      isActive: true,
+      isEmailVerified: true
+    });
+
+    const savedUser = await user.save();
+
+    if(role === 'JobSeeker'){
+      await JobSeekerProfile.create({
+        user: savedUser._id,
+        firstName: googleUser.firstName,
+        lastName: googleUser.lastName,
+        experienceLevel: 'Junior'
+      });
+    }
+
+    if(role === 'Employer'){
+      await CompanyProfile.create({
+        user: savedUser._id,
+        companyName: googleUser.firstName ? `${googleUser.firstName}'s Company` : 'New Company'
+      })
+    }
+
+    const accessToken = generateAccessToken(savedUser);
+    const refreshToken = await generateRefreshToken(savedUser, req.ip);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      expires: new Date(Date.now() + 7*24*60*60*1000)
+    });
+
+    res.json({
+      succeeded: true,
+      message: 'Login successful',
+      data: {
+        id: savedUser._id,
+        email: savedUser.email,
+        role: savedUser.role,
+        token: accessToken
+      }
+    });
+  }
+  catch(error)
+  {
+    console.error(error);
+    return res.status(500).json({
+      succeeded: false,
+      message: 'Google Authentication Failed',
+      errors: [error.message]
+    });
+  }
+};
