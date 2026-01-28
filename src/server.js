@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authroutes.js';
+import jobseekerRoutes from './routes/jobseekerroutes.js';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(cors({
 app.use(express.json()); 
 
 app.use('/api/auth', authRoutes);
+app.use('/api/jobseeker', jobseekerRoutes);
 
 app.get('/', (req, res) => {
   res.send('Resumeefy API is running...');

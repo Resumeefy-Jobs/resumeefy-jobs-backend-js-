@@ -13,6 +13,9 @@ const JobSeekerProfileSchema = new mongoose.Schema({
 
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
+  phone: { type: String },
+  city: { type: String },
+  country: { type: String },
   bio: { type: String },
   resumeUrl: { type: String },
   portfolioUrl: { type: String },
@@ -23,10 +26,32 @@ const JobSeekerProfileSchema = new mongoose.Schema({
     required: true
   },
 
-  skills: [{ 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Skill' 
-  }]
+  skills: { 
+    type: [String], 
+    default: [] 
+  },
+
+  headline: { type: String },
+  
+  workExperience: [{
+    company: String,
+    role: String,
+    startDate: Date,
+    endDate: Date,
+    current: { type: Boolean, default: false },
+    description: String
+  }],
+
+  education: [{
+    institution: String,
+    degree: String,
+    fieldOfStudy: String,
+    startDate: Date,
+    endDate: Date
+  }],
+
+  linkedinUrl: { type: String },
+  githubUrl: { type: String },
 
 }, { timestamps: true });
 
