@@ -29,3 +29,18 @@ export const sendEmail = async (to, subject, html) => {
         throw error;
     }
 };
+
+export const sendPasswordResetEmail = async (to, token) => {
+  const resetUrl = `https://resumeefy.com/reset-password?token=${token}`;
+
+  const subject = "Reset Your Password - Resumeefy";
+  const html = `
+    <h3>Password Reset Request</h3>
+    <p>You requested a password reset. Click the link below to set a new password:</p>
+    <a href="${resetUrl}" style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
+    <p>If you did not request this, please ignore this email.</p>
+    <p>This link expires in 1 hour.</p>
+  `;
+
+  await sendEmail(to, subject, html);
+};
