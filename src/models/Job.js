@@ -34,7 +34,10 @@ const JobSchema = new mongoose.Schema({
     },
 
     isActive: {type: Boolean, default: true},
-    applicationCount: {type: Number, default: 0}
+    applicationCount: {type: Number, default: 0},
+
+    isBlindMode: {type: Boolean, default: false},
+    lastActivityAt: {type: Date, default: Date.now}
 
 },{timeStamps: true});
 

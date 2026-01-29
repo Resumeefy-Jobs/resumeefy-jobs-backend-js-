@@ -4,7 +4,8 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authroutes.js';
 import jobseekerRoutes from './routes/jobseekerroutes.js';
-import jobroutes from './routes/jobroutes.js';
+import jobRoutes from './routes/jobroutes.js';
+import applicationRoutes from './routes/applicationroutes.js'
 
 dotenv.config();
 
@@ -21,7 +22,8 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/jobseeker', jobseekerRoutes);
-app.use('/api/jobs', jobroutes)
+app.use('/api/jobs', jobRoutes);
+app.use('/api/applications', applicationRoutes);
 
 app.get('/', (req, res) => {
   res.send('Resumeefy API is running...');
