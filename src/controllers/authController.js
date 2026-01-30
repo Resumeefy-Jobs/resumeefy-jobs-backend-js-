@@ -159,7 +159,7 @@ export const login = async (req, res) => {
     });
 
     res.json({
-      successed: true,
+      succeeded: true,
       message: 'Login successful',
       data: {
         id: findUser._id,

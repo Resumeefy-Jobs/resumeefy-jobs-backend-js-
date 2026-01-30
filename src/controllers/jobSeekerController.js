@@ -9,7 +9,7 @@ export const uploadResume = async (req, res) => {
         const resumeUrl = req.file.path;
 
         const profile = await JobSeekerProfile.findOneAndUpdate(
-            { user: req.user._id },
+            { user: req.user._id || req.user.id },
             { resumeUrl: resumeUrl },
             { new: true , upsert: true }
         );

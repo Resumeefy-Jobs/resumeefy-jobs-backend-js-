@@ -13,13 +13,13 @@ const JobSchema = new mongoose.Schema({
 
     jobType: {
         type: String, 
-        enum: ['Full-Time', 'Part-Time', 'Contract', 'Intership', 'Freelance'],
+        enum: ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'],
         required: true,
         index: true
     },
     workMode: {
         type: String,
-        enum: ['On-Site', 'Remote', 'Intership', 'Hybrid'],
+        enum: ['On-Site', 'Remote', 'Internship', 'Hybrid'],
         required: true,
         index: true
     },
@@ -39,7 +39,7 @@ const JobSchema = new mongoose.Schema({
     isBlindMode: {type: Boolean, default: false},
     lastActivityAt: {type: Date, default: Date.now}
 
-},{timeStamps: true});
+},{timestamps: true});
 
 JobSchema.index({title: 'text', description: 'text', companyName: 'text'});
 
