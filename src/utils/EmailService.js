@@ -14,6 +14,10 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmail = async (to, subject, html) => {
     try {
+        if (!to) {
+            throw new Error('Email recipient (to) is required');
+        }
+
         console.log('Preparing to send email...');
         
         const info = await transporter.sendMail({
@@ -74,4 +78,38 @@ export const sendNewApplicantNotification = async (employerEmail, employerName, 
     </div>
   `;
   await sendEmail(employerEmail, subject, html);
+};
+
+
+export const sendRejectionEmail = async (toEmail, applicantName, jobTitle, companyName, reason) => {
+  const subject = `Update on your application for ${jobTitle}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <h3>Hi ${applicantName},</h3>
+      <p>Thank you for giving us the opportunity to review your application for the <strong>${jobTitle}</strong> role at <strong>${companyName}</strong>.</p>
+      <p>After careful consideration, we have decided not to move forward with your application at this time.</p>
+      <p><strong>Feedback from the hiring team:</strong><br/>
+      <em>${reason}</em></p>
+      <p>We encourage you to apply for future openings that match your skills.</p>
+      <br/>
+      <p>Best regards,</p>
+      <p><strong>The ${companyName} Team</strong></p>
+    </div>
+  `;
+  await sendEmail(toEmail, subject, html);
+};
+
+export const sendShortlistEmail = async (toEmail, applicantName, jobTitle, companyName) => {
+  const subject = `Good News! You've been shortlisted for ${jobTitle}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <h3>Hi ${applicantName},</h3>
+      <p>Great news! We were impressed by your profile and have shortlisted you for the <strong>${jobTitle}</strong> position at <strong>${companyName}</strong>.</p>
+      <p>Our hiring team will contact you shortly regarding the next steps (Interview/Screening).</p>
+      <br/>
+      <p>Congratulations!</p>
+      <p><strong>The ${companyName} Team</strong></p>
+    </div>
+  `;
+  await sendEmail(toEmail, subject, html);
 };

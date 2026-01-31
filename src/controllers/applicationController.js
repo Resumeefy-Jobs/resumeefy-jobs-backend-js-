@@ -1,6 +1,7 @@
 import Application from "../models/Application.js";
 import SavedJob from "../models/SavedJob.js";
 import Job from "../models/Job.js";
+import User from "../models/User.js";
 import JobseekerProfile from "../models/JobSeekerProfile.js";
 import { sendNewApplicantNotification, sendApplicationSuccessEmail } from "../utils/EmailService.js";
 
@@ -19,6 +20,11 @@ export const applyForJob = async (req, res) => {
             return res.status(404).json({succeeded: false, message: 'Profile or Resume not available'});
         }
 
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({succeeded: false, message: 'User not found'});
+        }
+
         await Application.create({
             job: jobId,
             applicant: userId, 
@@ -33,7 +39,7 @@ export const applyForJob = async (req, res) => {
         const applicantName = `${profile.firstName} ${profile.lastName}`;
         const employerName = job.employerName || 'Employer';
         const dashboardLink = `https://resumeefy.com/employer/dashboard`;
-        const userEmail = req.user.email;
+        const userEmail = user.email;
 
         await Promise.allSettled([
             sendApplicationSuccessEmail(userEmail, applicantName, job.title, job.companyName),
