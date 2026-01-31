@@ -1,9 +1,6 @@
 import mongoose from 'mongoose';
 
 const CompanyProfileSchema = new mongoose.Schema({
-  isDeleted: { type: Boolean, default: false },
-  deletedAt: { type: Date, default: null },
-
   user: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User', 
@@ -11,14 +8,22 @@ const CompanyProfileSchema = new mongoose.Schema({
     unique: true 
   },
 
-  companyName: { type: String, required: true },
-  description: { type: String },
-  websiteUrl: { type: String },
-  logoUrl: { type: String },
+  companyName: { type: String, required: true, unique: true },
+  logoUrl: { type: String }, 
+  website: { type: String },
+  location: { type: String },
   
-  city: { type: String },
-  country: { type: String },
-  address: { type: String }
+  industry: { 
+    type: String, 
+    enum: ['Technology', 'Finance', 'Health', 'Education', 'Retail', 'Other'],
+    default: 'Other'
+  },
+  
+  description: { type: String },
+  size: { type: String }, 
+
+  isVerified: { type: Boolean, default: false },
+  verificationDocUrl: { type: String }
 
 }, { timestamps: true });
 

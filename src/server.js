@@ -6,6 +6,7 @@ import authRoutes from './routes/authroutes.js';
 import jobseekerRoutes from './routes/jobseekerroutes.js';
 import jobRoutes from './routes/jobroutes.js';
 import applicationRoutes from './routes/applicationroutes.js'
+import employerRoutes from './routes/employerRoutes.js';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobseeker', jobseekerRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/employer', employerRoutes);
 
 app.get('/', (req, res) => {
   res.send('Resumeefy API is running...');
