@@ -27,6 +27,22 @@ const UserSchema = new mongoose.Schema({
   tokenExpiresAt: { type: Date },
   passwordResetTokenExpiresAt: { type: Date },
 
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
+
+  isBanned: {
+    type: Boolean,
+    default: false
+  },
+
+  adminRole: { 
+    type: String, 
+    enum: ['Moderator', 'SuperAdmin'], 
+    default: 'Moderator' 
+  },
+
 }, { 
   timestamps: true,
   toJSON: { virtuals: true }, 
