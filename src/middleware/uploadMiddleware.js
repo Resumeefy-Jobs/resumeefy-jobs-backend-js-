@@ -1,6 +1,6 @@
-import {v2 as cloudinary} from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
-import {CloudinaryStorage} from 'multer-storage-cloudinary';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,18 +12,17 @@ cloudinary.config({
 });
 
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
+    cloudinary: cloudinary, 
     params: {
         folder: 'resumeefy',
-        allowed_formats: ['pdf', 'doc', 'docx'],
         resource_type: 'raw',
-        public_id: (req, file) => `resume_S${req.user._id}-${Date.now()}`
+        public_id: (req, file) => `resume_S${req.user?._id || 'anon'}-${Date.now()}` 
     },
 });
 
 const upload = multer({ 
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024}
+    limits: { fileSize: 5 * 1024 * 1024 } 
 });
 
-export default upload;  
+export default upload;

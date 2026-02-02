@@ -83,7 +83,7 @@ export const register = async (req, res) => {
     } else if (role === 'Employer') {
       await CompanyProfile.create({
         user: savedUser._id,
-        companyName: 'New Company' 
+        companyName: `Company_${savedUser._id}` 
       });
     }
 
