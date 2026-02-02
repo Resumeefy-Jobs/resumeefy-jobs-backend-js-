@@ -37,7 +37,13 @@ const JobSchema = new mongoose.Schema({
     applicationCount: {type: Number, default: 0},
 
     isBlindMode: {type: Boolean, default: false},
-    lastActivityAt: {type: Date, default: Date.now}
+    lastActivityAt: {type: Date, default: Date.now},
+
+    moderationStatus: { 
+        type: String, 
+        enum: ['Pending', 'Approved', 'Rejected'], 
+        default: 'Pending' 
+    },
 
 },{timestamps: true});
 

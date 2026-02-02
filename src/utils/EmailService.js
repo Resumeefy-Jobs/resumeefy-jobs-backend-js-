@@ -113,3 +113,22 @@ export const sendShortlistEmail = async (toEmail, applicantName, jobTitle, compa
   `;
   await sendEmail(toEmail, subject, html);
 };
+
+export const sendModeratorWelcomeEmail = async (toEmail, firstName, password) => {
+  const subject = `Welcome to the Resumeefy Admin Team`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <h3>Hello ${firstName},</h3>
+      <p>You have been added as a <strong>Moderator</strong> to the Resumeefy platform.</p>
+      <p>Here are your temporary login credentials:</p>
+      <div style="background: #f4f4f4; padding: 15px; border-radius: 5px; display: inline-block;">
+        <p><strong>Email:</strong> ${toEmail}</p>
+        <p><strong>Password:</strong> ${password}</p>
+      </div>
+      <p>Please log in immediately and change your password for security.</p>
+      <br/>
+      <a href="https://resumeefy-admin.com/login" style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Login to Admin Panel</a>
+    </div>
+  `;
+  await sendEmail(toEmail, subject, html);
+};

@@ -39,8 +39,8 @@ const UserSchema = new mongoose.Schema({
 
   adminRole: { 
     type: String, 
-    enum: ['Moderator', 'SuperAdmin'], 
-    default: 'Moderator' 
+    enum: ['Moderator', 'SuperAdmin', 'None'], 
+    default: 'None' 
   },
 
 }, { 

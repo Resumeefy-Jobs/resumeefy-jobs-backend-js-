@@ -30,7 +30,10 @@ export const getAllJobs = async(req, res) =>{
             keyword, location,jobType, workMode, page= 1,limit= 10
         } = req.query;
 
-        const query = {isActive: true}
+        const query = {
+            isActive: true,
+            moderationStatus: 'Approved'
+        }
 
         if(keyword){
             query.$text = {$search: keyword};
