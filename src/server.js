@@ -12,6 +12,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger.js';
 
 dotenv.config();
 const app = express();
@@ -61,6 +63,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));  
 app.use('/api/auth', authRoutes);
 app.use('/api/jobseeker', jobseekerRoutes);
 app.use('/api/jobs', jobRoutes);
